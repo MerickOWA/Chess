@@ -12,7 +12,7 @@ namespace Chess.Model
 
 		public Board(Piece[] pieces)
 		{
-			_pieces = pieces;
+			_pieces = (Piece[])pieces.Clone();
 		}
 
 		public Piece this[Cell cell] => _pieces[(int)cell];

@@ -39,9 +39,9 @@ namespace Chess.Model
 			{ Castling.K, 'K' },
 		};
 
-		public GameState(Piece[] pieces, Color active, Castling castling, Cell enpassant, int draw, int move)
+		public GameState(Piece[] board, Color active, Castling castling, Cell enpassant, int draw, int move)
 		{
-			Board = new Board(pieces);
+			Board = new Board(board);
 			Active = active;
 			Castling = castling;
 			Enpassant = enpassant;
