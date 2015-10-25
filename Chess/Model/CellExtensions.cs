@@ -8,29 +8,39 @@ namespace Chess.Model
 {
 	static class CellExtensions
 	{
-		private static Cell ToCell(int file, int rank)
+		public static Cell ToCell(int file, int rank)
 		{
 			return file >= 0 && file < 8 && rank >= 0 && rank < 8 ? (Cell)(rank * 8 + file) : Cell.None;
 		}
 
-		private static int ToFile(this Cell cell)
-		{
-			return (int)cell % 8;
-		}
-
-		private static int ToRank(this Cell cell)
-		{
-			return (int)cell / 8;
-		}
-
-		public static Cell Move(this Cell cell, Tuple<int, int> direction)
+		public static int ToFile(this Cell cell)
 		{
 			if (cell == Cell.None)
 			{
-				throw new InvalidOperationException("Can't move from nowhere");
+				throw new InvalidOperationException("Nowhere has no file");
 			}
 
-			return ToCell(cell.ToFile() + direction.Item1, cell.ToRank() + direction.Item2);
+			return (int)cell % 8;
+		}
+
+		public static int ToRank(this Cell cell)
+		{
+			if (cell == Cell.None)
+			{
+				throw new InvalidOperationException("Nowhere has no rank");
+			}
+
+			return (int)cell / 8;
+		}
+
+		public static char ToFileChar(this Cell cell)
+		{
+			return cell != Cell.None ? (char)('a' + cell.ToFile()) : '-';
+		}
+
+		public static char ToRankChar(this Cell cell)
+		{
+			return cell != Cell.None ? (char)('1' + cell.ToRank()) : '-';
 		}
 	}
 }

@@ -31,79 +31,81 @@ namespace Chess.Model
 			{ Piece.BlackKing, KingMoves },
 		};
 
-		static readonly IEnumerable<Tuple<int, int>> rookDirections = new[]
-		{
-			Tuple.Create(0, -1), //down
-			Tuple.Create(-1, 0), //left
-			Tuple.Create(1, 0),  //right
-			Tuple.Create(0, 1),  //up
-		};
-
-		static readonly IEnumerable<Tuple<int, int>> bishopDirections = new[]
-		{
-			Tuple.Create(-1,-1), // down-left
-			Tuple.Create(1, -1), // down-right
-			Tuple.Create(-1, 1), // up-left
-			Tuple.Create(1, 1),  // up-right
-		};
-
-		static readonly IEnumerable<Tuple<int, int>> queenDirections = rookDirections.Concat(bishopDirections);
-
-		static readonly IEnumerable<Tuple<int, int>> knightDirections = new[]
-		{
-			Tuple.Create(-1, -2), //down-down-left,
-			Tuple.Create(1, -2),  //down-down-right,
-			Tuple.Create(-2, -1), //down-left-left
-			Tuple.Create(2, -1),  //down-right-right
-			Tuple.Create(-2, 1),  //up-left-left
-			Tuple.Create(2, 1),   //up-right-right
-			Tuple.Create(-1, 2),  //up-up-left
-			Tuple.Create(1, 2),   //up-up-right
-		};
-
 		private static IEnumerable<Cell> WhitePawnMoves(Cell cell, Board board)
 		{
-			yield break;
+			return PawnMoves(cell, board, Direction.Up);
 		}
 
 		private static IEnumerable<Cell> BlackPawnMoves(Cell cell, Board board)
 		{
-			yield break;
+			return PawnMoves(cell, board, Direction.Down);
+		}
+
+		private static IEnumerable<Cell> PawnMoves(Cell cell, Board board, Direction forward)
+		{
+			var mycolor = board[cell].ToColor();
+			var to = cell + forward;
+			if (board[to] == Piece.None)
+			{
+				yield return to;
+
+				to += forward;
+				if (cell.ToRank() == 1 && board[to] == Piece.None)
+				{
+					yield return to;
+				}
+			}
+
+			Piece capture;
+			to = cell + (forward + Direction.Left);
+			if (to != Cell.None && (capture = board[to]) != Piece.None && capture.ToColor() != mycolor)
+			{
+				yield return to;
+			}
+
+			to = cell + (forward + Direction.Right);
+			if (to != Cell.None && (capture = board[to]) != Piece.None && capture.ToColor() != mycolor)
+			{
+				yield return to;
+			}
 		}
 
 		private static IEnumerable<Cell> KnightMoves(Cell cell, Board board)
 		{
-			return SlidingMoves(cell, board, knightDirections, limited: true);
+			return SlidingMoves(cell, board, Direction.Knight, limited: true);
 		}
 
 		private static IEnumerable<Cell> BishopMoves(Cell cell, Board board)
 		{
-			return SlidingMoves(cell, board, bishopDirections, limited: false);
+			return SlidingMoves(cell, board, Direction.Bishop, limited: false);
 		}
 
 		private static IEnumerable<Cell> RookMoves(Cell cell, Board board)
 		{
-			return SlidingMoves(cell, board, rookDirections, limited: false);
+			return SlidingMoves(cell, board, Direction.Rook, limited: false);
 		}
 
 		private static IEnumerable<Cell> QueenMoves(Cell cell, Board board)
 		{
-			return SlidingMoves(cell, board, queenDirections, limited: false);
+			return SlidingMoves(cell, board, Direction.Queen, limited: false);
 		}
 
 		private static IEnumerable<Cell> KingMoves(Cell cell, Board board)
 		{
-			return SlidingMoves(cell, board, queenDirections, limited: true);
+			foreach (var move in SlidingMoves(cell, board, Direction.Queen, limited: true))
+			{
+				yield return move;
+			}
 		}
 
-		private static IEnumerable<Cell> SlidingMoves(Cell from, Board board, IEnumerable<Tuple<int, int>> directions, bool limited)
+		private static IEnumerable<Cell> SlidingMoves(Cell from, Board board, IEnumerable<Direction> directions, bool limited)
 		{
 			var color = board[from].ToColor();
 
 			//*** Generate moves in every direction
 			foreach (var direction in directions)
 			{
-				var to = from.Move(direction);
+				var to = from + direction;
 
 				while (to != Cell.None)
 				{
@@ -132,7 +134,7 @@ namespace Chess.Model
 					}
 
 					//*** Move to the next cell along the "direction"
-					to = to.Move(direction);
+					to = to + direction;
 				}
 			}
 		}

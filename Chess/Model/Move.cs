@@ -17,5 +17,18 @@ namespace Chess.Model
 		public Cell From { get; }
 
 		public Cell To { get; }
+
+		public override string ToString()
+		{
+			var chars = new char[4];
+
+			return new string(new[]
+			{
+				this.From.ToFileChar(),
+				this.From.ToRankChar(),
+				this.To.ToFileChar(),
+				this.To.ToRankChar(),
+			});
+		}
 	}
 }

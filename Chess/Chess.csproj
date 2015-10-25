@@ -83,6 +83,7 @@
     <Compile Include="Model\Castling.cs" />
     <Compile Include="Model\Cell.cs" />
     <Compile Include="Model\Color.cs" />
+    <Compile Include="Model\Direction.cs" />
     <Compile Include="Model\GameState.cs" />
     <Compile Include="Model\Move.cs" />
     <Compile Include="Model\CellExtensions.cs" />
