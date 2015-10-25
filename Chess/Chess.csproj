@@ -85,8 +85,10 @@
     <Compile Include="Model\Color.cs" />
     <Compile Include="Model\GameState.cs" />
     <Compile Include="Model\Move.cs" />
+    <Compile Include="Model\CellExtensions.cs" />
     <Compile Include="Model\MoveGenerator.cs" />
     <Compile Include="Model\Piece.cs" />
+    <Compile Include="Model\PieceExtensions.cs" />
     <Compile Include="UI\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
