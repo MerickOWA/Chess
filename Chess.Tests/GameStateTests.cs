@@ -84,6 +84,15 @@ namespace Chess.Tests
 		}
 
 		[TestMethod]
+		public void GameState_FromForsythEdwardsNotation_Parses_Successfully_With_No_DrawClock_And_Move()
+		{
+			var target = GameState.FromForsythEdwardsNotation("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+
+			Assert.AreEqual(0, target.DrawClock);
+			Assert.AreEqual(1, target.Move);
+		}
+
+		[TestMethod]
 		public void GameState_ToString_Formats_Successfully()
 		{
 			var expected = "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2";

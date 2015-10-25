@@ -63,8 +63,8 @@ namespace Chess.Model
 			var active = ParseActive(state, ref i);
 			var castling = ParseCastling(state, ref i);
 			var enpassant = ParseEnpassant(state, ref i);
-			var draw = ParseDrawClock(state, ref i);
-			var move = ParseMove(state, ref i);
+			var draw = i < state.Length ? ParseDrawClock(state, ref i) : 0;
+			var move = i < state.Length ? ParseMove(state, ref i) : 1;
 
 			return new GameState(board, active, castling, enpassant, draw, move);
 		}
@@ -190,6 +190,11 @@ namespace Chess.Model
 			else
 			{
 				throw new ArgumentException();
+			}
+
+			if (i == state.Length)
+			{
+				return retval;
 			}
 
 			if (state[i] != ' ')
