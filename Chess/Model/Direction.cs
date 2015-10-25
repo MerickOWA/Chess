@@ -43,6 +43,8 @@ namespace Chess.Model
 		public static readonly Direction DownLeft = Down + Left;
 		public static readonly Direction DownRight = Down + Right;
 		public static readonly Direction DownRightRight = Down + Right + Right;
+		public static readonly Direction LeftLeft = Left + Left;
+		public static readonly Direction RightRight = Right + Right;
 		public static readonly Direction UpLeftLeft = Up + Left + Left;
 		public static readonly Direction UpLeft = Up + Left;
 		public static readonly Direction UpRight = Up + Right;

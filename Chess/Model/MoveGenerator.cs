@@ -15,42 +15,77 @@ namespace Chess.Model
 		int _drawClock;
 		int _move;
 
-		static readonly IDictionary<Piece, Func<Cell, Board, IEnumerable<Cell>>> pieceMoveGenerator = new Dictionary<Piece, Func<Cell, Board, IEnumerable<Cell>>>
+		public MoveGenerator(GameState state)
 		{
-			{ Piece.WhitePawn, WhitePawnMoves },
-			{ Piece.BlackPawn, BlackPawnMoves },
-			{ Piece.WhiteKnight, KnightMoves },
-			{ Piece.BlackKnight, KnightMoves },
-			{ Piece.WhiteBishop, BishopMoves },
-			{ Piece.BlackBishop, BishopMoves },
-			{ Piece.WhiteRook, RookMoves },
-			{ Piece.BlackRook, RookMoves },
-			{ Piece.WhiteQueen, QueenMoves },
-			{ Piece.BlackQueen, QueenMoves },
-			{ Piece.WhiteKing, KingMoves },
-			{ Piece.BlackKing, KingMoves },
-		};
-
-		private static IEnumerable<Cell> WhitePawnMoves(Cell cell, Board board)
-		{
-			return PawnMoves(cell, board, Direction.Up);
+			_board = state.Board;
+			_active = state.Active;
+			_castling = state.Castling;
+			_enpassant = state.Enpassant;
+			_drawClock = state.DrawClock;
+			_move = state.Move;
 		}
 
-		private static IEnumerable<Cell> BlackPawnMoves(Cell cell, Board board)
+		private IEnumerable<Cell> CellMoves(Cell cell)
 		{
-			return PawnMoves(cell, board, Direction.Down);
+			var piece = _board[cell];
+			if (piece == Piece.None || piece.ToColor() != _active)
+			{
+				//*** No moves for an empty cell or an opponent's piece
+				return Enumerable.Empty<Cell>();
+			}
+
+			switch (piece)
+			{
+				case Piece.WhitePawn:
+					return PawnMoves(cell, Direction.Up);
+
+				case Piece.BlackPawn:
+					return PawnMoves(cell, Direction.Down);
+
+				case Piece.WhiteKnight:
+				case Piece.BlackKnight:
+					return KnightMoves(cell);
+
+				case Piece.WhiteBishop:
+				case Piece.BlackBishop:
+					return BishopMoves(cell);
+
+				case Piece.WhiteRook:
+				case Piece.BlackRook:
+					return RookMoves(cell);
+
+				case Piece.WhiteQueen:
+				case Piece.BlackQueen:
+					return QueenMoves(cell);
+
+				case Piece.WhiteKing:
+				case Piece.BlackKing:
+					return KingMoves(cell);
+
+				default:
+					throw new InvalidOperationException("Can't generate moves for unknown piece");
+			}
 		}
 
-		private static IEnumerable<Cell> PawnMoves(Cell cell, Board board, Direction forward)
+		private IEnumerable<Cell> WhitePawnMoves(Cell cell)
 		{
-			var mycolor = board[cell].ToColor();
+			return PawnMoves(cell, Direction.Up);
+		}
+
+		private IEnumerable<Cell> BlackPawnMoves(Cell cell)
+		{
+			return PawnMoves(cell, Direction.Down);
+		}
+
+		private IEnumerable<Cell> PawnMoves(Cell cell, Direction forward)
+		{
 			var to = cell + forward;
-			if (board[to] == Piece.None)
+			if (_board[to] == Piece.None)
 			{
 				yield return to;
 
 				to += forward;
-				if (cell.ToRank() == 1 && board[to] == Piece.None)
+				if (cell.ToRank() == 1 && _board[to] == Piece.None)
 				{
 					yield return to;
 				}
@@ -58,50 +93,62 @@ namespace Chess.Model
 
 			Piece capture;
 			to = cell + (forward + Direction.Left);
-			if (to != Cell.None && (capture = board[to]) != Piece.None && capture.ToColor() != mycolor)
+			if (to != Cell.None && (to == _enpassant || ((capture = _board[to]) != Piece.None && capture.ToColor() != _active)))
 			{
+				//*** Allowed to capture an opponent's piece on the board, or the enpassant square
 				yield return to;
 			}
 
 			to = cell + (forward + Direction.Right);
-			if (to != Cell.None && (capture = board[to]) != Piece.None && capture.ToColor() != mycolor)
+			if (to != Cell.None && (to == _enpassant || ((capture = _board[to]) != Piece.None && capture.ToColor() != _active)))
 			{
+				//*** Allowed to capture an opponent's piece on the board, or the enpassant square
 				yield return to;
 			}
 		}
 
-		private static IEnumerable<Cell> KnightMoves(Cell cell, Board board)
+		private IEnumerable<Cell> KnightMoves(Cell cell)
 		{
-			return SlidingMoves(cell, board, Direction.Knight, limited: true);
+			return SlidingMoves(cell, Direction.Knight, limited: true);
 		}
 
-		private static IEnumerable<Cell> BishopMoves(Cell cell, Board board)
+		private IEnumerable<Cell> BishopMoves(Cell cell)
 		{
-			return SlidingMoves(cell, board, Direction.Bishop, limited: false);
+			return SlidingMoves(cell, Direction.Bishop, limited: false);
 		}
 
-		private static IEnumerable<Cell> RookMoves(Cell cell, Board board)
+		private IEnumerable<Cell> RookMoves(Cell cell)
 		{
-			return SlidingMoves(cell, board, Direction.Rook, limited: false);
+			return SlidingMoves(cell, Direction.Rook, limited: false);
 		}
 
-		private static IEnumerable<Cell> QueenMoves(Cell cell, Board board)
+		private IEnumerable<Cell> QueenMoves(Cell cell)
 		{
-			return SlidingMoves(cell, board, Direction.Queen, limited: false);
+			return SlidingMoves(cell, Direction.Queen, limited: false);
 		}
 
-		private static IEnumerable<Cell> KingMoves(Cell cell, Board board)
+		private IEnumerable<Cell> KingMoves(Cell cell)
 		{
-			foreach (var move in SlidingMoves(cell, board, Direction.Queen, limited: true))
+			foreach (var move in SlidingMoves(cell, Direction.Queen, limited: true))
 			{
 				yield return move;
 			}
+
+			var queenSide = _active == Color.White ? Castling.Q : Castling.q;
+			if ((_castling & queenSide) == queenSide)
+			{
+				yield return cell + Direction.LeftLeft;
+			}
+
+			var kingSide = _active == Color.White ? Castling.K : Castling.k;
+			if ((_castling & kingSide) == kingSide)
+			{
+				yield return cell + Direction.RightRight;
+			}
 		}
 
-		private static IEnumerable<Cell> SlidingMoves(Cell from, Board board, IEnumerable<Direction> directions, bool limited)
+		private IEnumerable<Cell> SlidingMoves(Cell from, IEnumerable<Direction> directions, bool limited)
 		{
-			var color = board[from].ToColor();
-
 			//*** Generate moves in every direction
 			foreach (var direction in directions)
 			{
@@ -109,7 +156,7 @@ namespace Chess.Model
 
 				while (to != Cell.None)
 				{
-					var capture = board[to];
+					var capture = _board[to];
 					if (capture == Piece.None)
 					{
 						//*** Allowed to move to a cell if there is no piece there
@@ -117,9 +164,9 @@ namespace Chess.Model
 					}
 					else
 					{
-						if (capture.ToColor() != color)
+						if (capture.ToColor() != _active)
 						{
-							//*** Allowed to capture a piece if its not my color
+							//*** Allowed to capture an opponent's piece
 							yield return to;
 						}
 
@@ -139,16 +186,6 @@ namespace Chess.Model
 			}
 		}
 
-		public MoveGenerator(GameState state)
-		{
-			_board = state.Board;
-			_active = state.Active;
-			_castling = state.Castling;
-			_enpassant = state.Enpassant;
-			_drawClock = state.DrawClock;
-			_move = state.Move;
-		}
-
 		public void MakeMove(Move move)
 		{
 			throw new NotImplementedException();
@@ -163,10 +200,7 @@ namespace Chess.Model
 		{
 			return
 				from cell in BoardCells()
-				let piece = _board[cell]
-				where piece != Piece.None && piece.ToColor() == _active
-				let generator = pieceMoveGenerator[piece]
-				from move in generator(cell, _board)
+				from move in CellMoves(cell)
 				select new Move(cell, move);
 		}
 
