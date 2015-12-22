@@ -5,8 +5,51 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Chess.UI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Width="768" Height="535">
+  <Window.Resources>
+    <DrawingBrush x:Key="CheckeredWood">
+      <DrawingBrush.Drawing>
+        <DrawingGroup>
+          <ImageDrawing Rect="0,0,8,8" ImageSource="/Chess;component/Images/oak-wood-background.jpg" />
+          <GeometryDrawing Geometry="M0,0L0,1L1,1L1,0z M2,0L2,1L3,1L3,0z M4,0L4,1L5,1L5,0z M6,0L6,1L7,1L7,0z M1,1L1,2L2,2L2,1z M3,1L3,2L4,2L4,1z M5,1L5,2L6,2L6,1z M7,1L7,2L8,2L8,1z M0,2L0,3L1,3L1,2z M2,2L2,3L3,3L3,2z M4,2L4,3L5,3L5,2z M6,2L6,3L7,3L7,2z M1,3L1,4L2,4L2,3z M3,3L3,4L4,4L4,3z M5,3L5,4L6,4L6,3z M7,3L7,4L8,4L8,3z M0,4L0,5L1,5L1,4z M2,4L2,5L3,5L3,4z M4,4L4,5L5,5L5,4z M6,4L6,5L7,5L7,4z M1,5L1,6L2,6L2,5z M3,5L3,6L4,6L4,5z M5,5L5,6L6,6L6,5z M7,5L7,6L8,6L8,5z M0,6L0,7L1,7L1,6z M2,6L2,7L3,7L3,6z M4,6L4,7L5,7L5,6z M6,6L6,7L7,7L7,6z M1,7L1,8L2,8L2,7z M3,7L3,8L4,8L4,7z M5,7L5,8L6,8L6,7z M7,7L7,8L8,8L8,7z" Brush="#66FFE4C4" />
+        </DrawingGroup>
+      </DrawingBrush.Drawing>
+    </DrawingBrush>
+  </Window.Resources>
     <Grid>
-        
-    </Grid>
+    <Canvas Name="Board" Width="360" Height="360" Background="{StaticResource CheckeredWood}">
+      <local:BlackRook Canvas.Top="0" Canvas.Left="0" />
+        <local:BlackKnight Canvas.Top="0" Canvas.Left="45" />
+        <local:BlackBishop Canvas.Top="0" Canvas.Left="90" />
+        <local:BlackQueen Canvas.Top="0" Canvas.Left="135" />
+        <local:BlackKing Canvas.Top="0" Canvas.Left="180" />
+        <local:BlackBishop Canvas.Top="0" Canvas.Left="225" />
+        <local:BlackKnight Canvas.Top="0" Canvas.Left="270" />
+        <local:BlackRook Canvas.Top="0" Canvas.Left="315" />
+        <local:BlackPawn Canvas.Top="45" Canvas.Left="0" />
+        <local:BlackPawn Canvas.Top="45" Canvas.Left="45" />
+        <local:BlackPawn Canvas.Top="45" Canvas.Left="90" />
+        <local:BlackPawn Canvas.Top="45" Canvas.Left="135" />
+        <local:BlackPawn Canvas.Top="45" Canvas.Left="180" />
+        <local:BlackPawn Canvas.Top="45" Canvas.Left="225" />
+        <local:BlackPawn Canvas.Top="45" Canvas.Left="270" />
+        <local:BlackPawn Canvas.Top="45" Canvas.Left="315" />
+        <local:WhitePawn Canvas.Top="270" Canvas.Left="0" />
+        <local:WhitePawn Canvas.Top="270" Canvas.Left="45" />
+        <local:WhitePawn Canvas.Top="270" Canvas.Left="90" />
+        <local:WhitePawn Canvas.Top="270" Canvas.Left="135" />
+        <local:WhitePawn Canvas.Top="270" Canvas.Left="180" />
+        <local:WhitePawn Canvas.Top="270" Canvas.Left="225" />
+        <local:WhitePawn Canvas.Top="270" Canvas.Left="270" />
+        <local:WhitePawn Canvas.Top="270" Canvas.Left="315" />
+        <local:WhiteRook Canvas.Top="315" Canvas.Left="0" />
+        <local:WhiteKnight Canvas.Top="315" Canvas.Left="45" />
+        <local:WhiteBishop Canvas.Top="315" Canvas.Left="90" />
+        <local:WhiteQueen Canvas.Top="315" Canvas.Left="135" />
+        <local:WhiteKing Canvas.Top="315" Canvas.Left="180" />
+        <local:WhiteBishop Canvas.Top="315" Canvas.Left="225" />
+        <local:WhiteKnight Canvas.Top="315" Canvas.Left="270" />
+        <local:WhiteRook Canvas.Top="315" Canvas.Left="315" />
+    </Canvas>
+  </Grid>
 </Window>

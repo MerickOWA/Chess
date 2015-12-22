@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="Chess.UI.WhiteKing"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Chess.UI"
+             mc:Ignorable="d" 
+             d:DesignHeight="45" d:DesignWidth="45">
+  <UserControl.Template>
+    <ControlTemplate>
+      <Canvas Width="45" Height="45">
+        <Path Data="M 22.5,12 L 22.5,6 M 20,8 L 25,8" Stroke="Black" />
+        <Path Data="M 22.5,25 C 22.5,25 27,17.5 25.5,14.5 C 25.5,14.5 24.5,12 22.5,12 C 20.5,12 19.5,14.5 19.5,14.5 C 18,17.5 22.5,25 22.5,25" Stroke="Black" Fill="White" />
+        <Path Data="M 12.5,37 C 17,40.5 27,40.5 32.5,37 L 32.5,30 C 32.5,30 41.5,25.5 38.5,19.5 C 34.5,13 25,16 22.5,23.5 L 22.5,27 L 22.5,23.5 C 20,16 10.5,13 6.5,19.5 C 3.5,25.5 12.5,30 12.5,30 L 12.5,37 z" Fill="White" Stroke="Black" StrokeMiterLimit="1" />
+        <Path Data="M 12.5,30 C 17,27 27,27 32.5,30 M 12.5,33.5 C 17,30.5 27,30.5 32.5,33.5 M 12.5,37 C 17,34 27,34 32.5,37" Stroke="Black" />
+      </Canvas>
+    </ControlTemplate>
+  </UserControl.Template>
+</UserControl>

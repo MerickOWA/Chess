@@ -74,6 +74,48 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UI\WhiteBishop.xaml.cs">
+      <DependentUpon>WhiteBishop.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\WhiteKing.xaml.cs">
+      <DependentUpon>WhiteKing.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\WhiteKnight.xaml.cs">
+      <DependentUpon>WhiteKnight.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\WhitePawn.xaml.cs">
+      <DependentUpon>WhitePawn.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\WhiteQueen.xaml.cs">
+      <DependentUpon>WhiteQueen.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\WhiteRook.xaml.cs">
+      <DependentUpon>WhiteRook.xaml</DependentUpon>
+    </Compile>
+    <Page Include="UI\BlackBishop.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\BlackKing.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\BlackKnight.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\BlackPawn.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\BlackQueen.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\BlackRook.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -94,10 +136,52 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="UI\BlackBishop.xaml.cs">
+      <DependentUpon>BlackBishop.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\BlackKing.xaml.cs">
+      <DependentUpon>BlackKing.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\BlackKnight.xaml.cs">
+      <DependentUpon>BlackKnight.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\BlackPawn.xaml.cs">
+      <DependentUpon>BlackPawn.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\BlackQueen.xaml.cs">
+      <DependentUpon>BlackQueen.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\BlackRook.xaml.cs">
+      <DependentUpon>BlackRook.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UI\WhiteBishop.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\WhiteKing.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\WhiteKnight.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\WhitePawn.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\WhiteQueen.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\WhiteRook.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -137,6 +221,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\oak-wood-background.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

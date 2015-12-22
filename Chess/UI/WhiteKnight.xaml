@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="Chess.UI.WhiteKnight"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Chess.UI"
+             mc:Ignorable="d" 
+             d:DesignHeight="45" d:DesignWidth="45">
+  <UserControl.Template>
+    <ControlTemplate>
+      <Canvas Width="45" Height="45">
+        <Path Data="M 22,10 C 32.5,11 38.5,18 38,39 L 15,39 C 15,30 25,32.5 23,18" Fill="White" Stroke="Black" />
+        <Path Data="M 24,18 C 24.38,20.91 18.45,25.37 16,27 C 13,29 13.18,31.34 11,31 C 9.958,30.06 12.41,27.96 11,28 C 10,28 11.19,29.23 10,30 C 9,30 5.997,31 6,26 C 6,24 12,14 12,14 C 12,14 13.89,12.1 14,10.5 C 13.27,9.506 13.5,8.5 13.5,7.5 C 14.5,6.5 16.5,10 16.5,10 L 18.5,10 C 18.5,10 19.28,8.008 21,7 C 22,7 22,10 22,10 C 32.5,11 38.5,18 38,39" Fill="White" Stroke="Black" StrokeEndLineCap="Round" StrokeStartLineCap="Round" StrokeLineJoin="Round" />
+        <Path Data="M 9.5 25.5 A 0.5 0.5 0 1 1 8.5,25.5 A 0.5 0.5 0 1 1 9.5 25.5 z" Stroke="Black" />
+        <Path Data="M 15 15.5 A 0.5 1.5 0 1 1  14,15.5 A 0.5 1.5 0 1 1  15 15.5 z" Stroke="Black" >
+          <Path.RenderTransform>
+            <TransformGroup>
+              <RotateTransform Angle="30" CenterX="14.5" CenterY="15.5"/>
+            </TransformGroup>
+          </Path.RenderTransform>
+        </Path>
+      </Canvas>
+    </ControlTemplate>
+  </UserControl.Template>
+</UserControl>
