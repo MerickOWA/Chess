@@ -35,8 +35,8 @@ namespace Chess.Tests
 		[TestMethod]
 		public void GameState_FromForsythEdwardsNotation_Parses_Active_Successfully()
 		{
-			Assert.AreEqual(Color.White, GameState.FromForsythEdwardsNotation("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1").Active);
-			Assert.AreEqual(Color.Black, GameState.FromForsythEdwardsNotation("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1").Active);
+			Assert.AreEqual(Piece.White, GameState.FromForsythEdwardsNotation("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1").Active);
+			Assert.AreEqual(Piece.Black, GameState.FromForsythEdwardsNotation("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1").Active);
 		}
 
 		[TestMethod]
@@ -99,6 +99,34 @@ namespace Chess.Tests
 			var actual = GameState.FromForsythEdwardsNotation(expected).ToString();
 
 			Assert.AreEqual(expected, actual);
+		}
+
+		[TestMethod]
+		public void GameState_Board_Is_Immutable_After_Construction()
+		{
+			var array = new Piece[64];
+
+			array[0] = Piece.WhiteRook;
+
+			var target = new GameState(array, Piece.White, Castling.KQkq, Cell.None, 0, 1);
+
+			//*** Initial state: a1 should have a WhiteRook
+			Assert.AreEqual(Piece.WhiteRook, target.Board[Cell.a1]);
+
+			//*** Outside array is mutated
+			array[0] = Piece.BlackRook;
+
+			//*** Expected: board a1 should maintain its inital state
+			Assert.AreEqual(Piece.WhiteRook, target.Board[Cell.a1]);
+
+			//*** Also, converting the board back to an array
+			var array2 = target.Board.ToArray();
+
+			//*** And mutating the returned array, shouldn't modify the original board
+			array2[0] = Piece.BlackRook;
+
+			//*** Expected: board a1 should maintain its inital state
+			Assert.AreEqual(Piece.WhiteRook, target.Board[Cell.a1]);
 		}
 	}
 }

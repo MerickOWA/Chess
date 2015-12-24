@@ -20,10 +20,8 @@ namespace Chess.Tests.MoveGeneratorTests
 		{
 			target.MakeMove(new Move(Cell.a1, Cell.b1));
 
-			var state = target.ToState();
-
-			Assert.AreEqual(Piece.None, state.Board[Cell.a1]);
-			Assert.AreEqual(Piece.WhiteRook, state.Board[Cell.b1]);
+			Assert.AreEqual(Piece.None, target.Board[Cell.a1]);
+			Assert.AreEqual(Piece.WhiteRook, target.Board[Cell.b1]);
 		}
 
 		[TestMethod]
@@ -31,10 +29,8 @@ namespace Chess.Tests.MoveGeneratorTests
 		{
 			target.MakeMove(new Move(Cell.e1, Cell.g1));
 
-			var state = target.ToState();
-
-			Assert.AreEqual(Piece.None, state.Board[Cell.h1]);
-			Assert.AreEqual(Piece.WhiteRook, state.Board[Cell.f1]);
+			Assert.AreEqual(Piece.None, target.Board[Cell.h1]);
+			Assert.AreEqual(Piece.WhiteRook, target.Board[Cell.f1]);
 		}
 
 		[TestMethod]
@@ -42,10 +38,8 @@ namespace Chess.Tests.MoveGeneratorTests
 		{
 			target.MakeMove(new Move(Cell.e1, Cell.c1));
 
-			var state = target.ToState();
-
-			Assert.AreEqual(Piece.None, state.Board[Cell.a1]);
-			Assert.AreEqual(Piece.WhiteRook, state.Board[Cell.d1]);
+			Assert.AreEqual(Piece.None, target.Board[Cell.a1]);
+			Assert.AreEqual(Piece.WhiteRook, target.Board[Cell.d1]);
 		}
 
 		[TestMethod]
@@ -54,10 +48,8 @@ namespace Chess.Tests.MoveGeneratorTests
 			target.MakeMove(new Move(Cell.a1, Cell.b1));
 			target.MakeMove(new Move(Cell.e8, Cell.g8));
 
-			var state = target.ToState();
-
-			Assert.AreEqual(Piece.None, state.Board[Cell.h8]);
-			Assert.AreEqual(Piece.BlackRook, state.Board[Cell.f8]);
+			Assert.AreEqual(Piece.None, target.Board[Cell.h8]);
+			Assert.AreEqual(Piece.BlackRook, target.Board[Cell.f8]);
 		}
 
 		[TestMethod]
@@ -66,10 +58,8 @@ namespace Chess.Tests.MoveGeneratorTests
 			target.MakeMove(new Move(Cell.a1, Cell.b1));
 			target.MakeMove(new Move(Cell.e8, Cell.c8));
 
-			var state = target.ToState();
-
-			Assert.AreEqual(Piece.None, state.Board[Cell.a8]);
-			Assert.AreEqual(Piece.BlackRook, state.Board[Cell.d8]);
+			Assert.AreEqual(Piece.None, target.Board[Cell.a8]);
+			Assert.AreEqual(Piece.BlackRook, target.Board[Cell.d8]);
 		}
 
 		[TestMethod]
@@ -78,9 +68,7 @@ namespace Chess.Tests.MoveGeneratorTests
 			target.MakeMove(new Move(Cell.a2, Cell.a4));
 			target.MakeMove(new Move(Cell.b4, Cell.a3));
 
-			var state = target.ToState();
-
-			Assert.AreEqual(Piece.None, state.Board[Cell.a4]);
+			Assert.AreEqual(Piece.None, target.Board[Cell.a4]);
 		}
 
 		[TestMethod]
@@ -90,9 +78,7 @@ namespace Chess.Tests.MoveGeneratorTests
 			target.MakeMove(new Move(Cell.c7, Cell.c5));
 			target.MakeMove(new Move(Cell.e5, Cell.c6));
 
-			var state = target.ToState();
-
-			Assert.AreEqual(Piece.BlackPawn, state.Board[Cell.c5]);
+			Assert.AreEqual(Piece.BlackPawn, target.Board[Cell.c5]);
 		}
 
 		[TestMethod]
@@ -104,9 +90,7 @@ namespace Chess.Tests.MoveGeneratorTests
 			target.MakeMove(new Move(Cell.b8, Cell.a8));
 			target.MakeMove(new Move(Cell.c7, Cell.c8, Piece.Queen));
 
-			var state = target.ToState();
-
-			Assert.AreEqual(Piece.WhiteQueen, state.Board[Cell.c8]);
+			Assert.AreEqual(Piece.WhiteQueen, target.Board[Cell.c8]);
 		}
 
 		[TestMethod]
@@ -114,16 +98,11 @@ namespace Chess.Tests.MoveGeneratorTests
 		{
 			target.MakeMove(new Move(Cell.a1, Cell.b1));
 
-			var state1 = target.ToState();
-
-			Assert.AreNotEqual(initial.Active, state1.Active);
+			Assert.AreEqual(Piece.Black, target.Active);
 
 			target.MakeMove(new Move(Cell.a8, Cell.b8));
 
-			var state2 = target.ToState();
-
-			Assert.AreNotEqual(state1.Active, state2.Active);
-			Assert.AreEqual(initial.Active, state2.Active);
+			Assert.AreEqual(Piece.White, target.Active);
 		}
 
 		[TestMethod]
@@ -131,9 +110,7 @@ namespace Chess.Tests.MoveGeneratorTests
 		{
 			target.MakeMove(new Move(Cell.a1, Cell.b1));
 
-			var state = target.ToState();
-
-			Assert.AreEqual(initial.Move, state.Move);
+			Assert.AreEqual(1, target.Move);
 		}
 
 		[TestMethod]
@@ -142,9 +119,7 @@ namespace Chess.Tests.MoveGeneratorTests
 			target.MakeMove(new Move(Cell.a1, Cell.b1));
 			target.MakeMove(new Move(Cell.a8, Cell.b8));
 
-			var state = target.ToState();
-
-			Assert.AreEqual(initial.Move + 1, state.Move);
+			Assert.AreEqual(2, target.Move);
 		}
 
 		[TestMethod]
@@ -152,15 +127,15 @@ namespace Chess.Tests.MoveGeneratorTests
 		{
 			target.MakeMove(new Move(Cell.a2, Cell.a4));
 
-			Assert.AreEqual(Cell.a3, target.ToState().Enpassant);
+			Assert.AreEqual(Cell.a3, target.Enpassant);
 
 			target.MakeMove(new Move(Cell.c7, Cell.c5));
 
-			Assert.AreEqual(Cell.c6, target.ToState().Enpassant);
+			Assert.AreEqual(Cell.c6, target.Enpassant);
 
 			target.MakeMove(new Move(Cell.a1, Cell.b1));
 
-			Assert.AreEqual(Cell.None, target.ToState().Enpassant);
+			Assert.AreEqual(Cell.None, target.Enpassant);
 		}
 
 		[TestMethod]
@@ -168,9 +143,7 @@ namespace Chess.Tests.MoveGeneratorTests
 		{
 			target.MakeMove(new Move(Cell.a1, Cell.b1));
 
-			var state = target.ToState();
-
-			Assert.AreEqual(initial.DrawClock + 1, state.DrawClock);
+			Assert.AreEqual(1, target.DrawClock);
 		}
 
 		[TestMethod]
@@ -179,9 +152,7 @@ namespace Chess.Tests.MoveGeneratorTests
 			target.MakeMove(new Move(Cell.a1, Cell.b1));
 			target.MakeMove(new Move(Cell.b6, Cell.d5));
 
-			var state = target.ToState();
-
-			Assert.AreEqual(0, state.DrawClock);
+			Assert.AreEqual(0, target.DrawClock);
 		}
 
 		[TestMethod]
@@ -190,9 +161,7 @@ namespace Chess.Tests.MoveGeneratorTests
 			target.MakeMove(new Move(Cell.a1, Cell.b1));
 			target.MakeMove(new Move(Cell.c7, Cell.c5));
 
-			var state = target.ToState();
-
-			Assert.AreEqual(0, state.DrawClock);
+			Assert.AreEqual(0, target.DrawClock);
 		}
 
 		[TestMethod]
@@ -200,11 +169,11 @@ namespace Chess.Tests.MoveGeneratorTests
 		{
 			target.MakeMove(new Move(Cell.e1, Cell.f1));
 
-			Assert.AreEqual(Castling.kq, target.ToState().Castling);
+			Assert.AreEqual(Castling.kq, target.Castling);
 
 			target.MakeMove(new Move(Cell.e8, Cell.f8));
 
-			Assert.AreEqual(Castling.None, target.ToState().Castling);
+			Assert.AreEqual(Castling.None, target.Castling);
 		}
 
 		[TestMethod]
@@ -212,11 +181,11 @@ namespace Chess.Tests.MoveGeneratorTests
 		{
 			target.MakeMove(new Move(Cell.a1, Cell.b1));
 
-			Assert.AreEqual(Castling.Kkq, target.ToState().Castling);
+			Assert.AreEqual(Castling.Kkq, target.Castling);
 
 			target.MakeMove(new Move(Cell.a8, Cell.b8));
 
-			Assert.AreEqual(Castling.Kk, target.ToState().Castling);
+			Assert.AreEqual(Castling.Kk, target.Castling);
 		}
 
 		[TestMethod]
@@ -224,11 +193,11 @@ namespace Chess.Tests.MoveGeneratorTests
 		{
 			target.MakeMove(new Move(Cell.h1, Cell.g1));
 
-			Assert.AreEqual(Castling.Qkq, target.ToState().Castling);
+			Assert.AreEqual(Castling.Qkq, target.Castling);
 
 			target.MakeMove(new Move(Cell.h8, Cell.g8));
 
-			Assert.AreEqual(Castling.Qq, target.ToState().Castling);
+			Assert.AreEqual(Castling.Qq, target.Castling);
 		}
 	}
 }

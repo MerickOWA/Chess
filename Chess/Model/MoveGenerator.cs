@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Chess.Model
 {
-	class MoveGenerator
+	internal class MoveGenerator
 	{
-		Piece[] _board;
-		Color _active;
+		InternalBoard _board;
+		Piece _active;
 		Castling _castling;
 		Cell _enpassant;
 		int _drawClock;
@@ -17,7 +18,7 @@ namespace Chess.Model
 
 		public MoveGenerator(GameState state)
 		{
-			_board = state.Board.ToArray();
+			_board = new InternalBoard(state.Board);
 			_active = state.Active;
 			_castling = state.Castling;
 			_enpassant = state.Enpassant;
@@ -25,26 +26,31 @@ namespace Chess.Model
 			_move = state.Move;
 		}
 
-		public void MakeMove(Move move)
+		public IBoard Board => _board;
+		public Piece Active => _active;
+		public Castling Castling => _castling;
+		public Cell Enpassant => _enpassant;
+		public int DrawClock => _drawClock;
+		public int Move => _move;
+
+		public UndoMove MakeMove(Move move)
 		{
 			var from = (int)move.From;
 			var to = (int)move.To;
-			var mid = (from + to) / 2;
 
 			//*** Move the piece on the board from the 'from' cell to the 'to' cell
-			var capture = _board[to];
-			var piece = _board[from];
+			var capture = _board[move.To];
+			var piece = _board[move.From];
 			var pieceType = piece & Piece.Type;
 
-			if (move.Promotion == Piece.None)
+			var retval = new UndoMove(move.From, move.To, move.Promotion, capture, _castling, _enpassant, _drawClock);
+
+			if (move.Promotion != Piece.None)
 			{
-				_board[to] = piece;
-			}
-			else
-			{
-				_board[to] = (move.Promotion & Piece.Type) | (piece & Piece.Color);
+				piece = _active | move.Promotion;
 			}
 
+			_board[to] = piece;
 			_board[from] = Piece.None;
 
 			//*** Remove captured pawn in enpassant moves
@@ -56,9 +62,9 @@ namespace Chess.Model
 			//*** If we've castled the king, move the corrisponding rook as well
 			if (Math.Abs(from - to) == 2 && pieceType == Piece.King)
 			{
-				var rook = (int)GetCastlingRookCell(move.To);
+				var rook = GetCastlingRookCell(move.To);
 
-				_board[mid] = _board[rook];
+				_board[(from + to) / 2] = _board[rook];
 				_board[rook] = Piece.None;
 			}
 
@@ -95,7 +101,7 @@ namespace Chess.Model
 			}
 
 			//*** Increment the move count if black just made a move
-			if (_active == Color.Black)
+			if (_active == Piece.Black)
 			{
 				_move++;
 			}
@@ -114,7 +120,7 @@ namespace Chess.Model
 			//*** Update enpassant state if a pawn has made a double move
 			if (pieceType == Piece.Pawn && Math.Abs(from - to) == 16)
 			{
-				_enpassant = (Cell)mid;
+				_enpassant = (Cell)((from + to) / 2);
 			}
 			else
 			{
@@ -122,7 +128,45 @@ namespace Chess.Model
 			}
 
 			//*** Update the active color state
-			_active = _active != Color.White ? Color.White : Color.Black;
+			_active ^= Piece.Color;
+
+			return retval;
+		}
+
+		public void UndoMove(UndoMove move)
+		{
+			var from = (int)move.From;
+			var to = (int)move.To;
+
+			var piece = _board[to];
+
+			if (move.Promotion != Piece.None)
+			{
+				piece = (piece & Piece.Color) | Piece.Pawn;
+			}
+
+			var pieceType = piece & Piece.Type;
+
+			_board[from] = piece;
+			_board[to] = move.Capture;
+
+			if (move.To == move.Enpassant && pieceType == Piece.Pawn)
+			{
+				_board[(from & 56) | (to & 7)] = Piece.Pawn | _active;
+			}
+
+			if (Math.Abs(from - to) == 2 && pieceType == Piece.King)
+			{
+				var mid = (from + to) / 2;
+				var rook = GetCastlingRookCell(move.To);
+				_board[rook] = _board[mid];
+				_board[mid] = Piece.None;
+			}
+
+			_active ^= Piece.Color;
+			_enpassant = move.Enpassant;
+			_castling = move.Castling;
+			_drawClock = move.DrawClock;
 		}
 
 		private static Cell GetCastlingRookCell(Cell kingTo)
@@ -138,41 +182,23 @@ namespace Chess.Model
 			throw new InvalidOperationException("Invalid castling move");
 		}
 
-		public void UndoMove(Move move)
-		{
-			throw new NotImplementedException();
-		}
-
 		public IEnumerable<Move> GetMoves()
 		{
+			return GetAvailableMoves(_active);
+		}
+
+		private IEnumerable<Move> GetAvailableMoves(Piece color)
+		{
 			return
-				from cell in BoardCells()
-				from move in CellMoves(cell)
-				select new Move(cell, move);
+				from src in _board
+				let piece = _board[src]
+				where (piece & Piece.Color) == color
+				from dst in CellMoves(src, piece)
+				select new Move(src, dst);
 		}
 
-		private static IEnumerable<Cell> BoardCells()
+		private IEnumerable<Cell> CellMoves(Cell cell, Piece piece)
 		{
-			for(Cell i = Cell.a1; i <= Cell.h8; i++)
-			{
-				yield return i;
-			}
-		}
-
-		public  GameState ToState()
-		{
-			return new GameState(_board, _active, _castling, _enpassant, _drawClock, _move);
-		}
-
-		private IEnumerable<Cell> CellMoves(Cell cell)
-		{
-			var piece = _board[(int)cell];
-			if (piece == Piece.None || piece.ToColor() != _active)
-			{
-				//*** No moves for an empty cell or an opponent's piece
-				return Enumerable.Empty<Cell>();
-			}
-
 			switch (piece)
 			{
 				case Piece.WhitePawn:
@@ -209,27 +235,26 @@ namespace Chess.Model
 		private IEnumerable<Cell> PawnMoves(Cell cell, Direction forward)
 		{
 			var to = cell + forward;
-			if (_board[(int)to] == Piece.None)
+			if (_board[to] == Piece.None)
 			{
 				yield return to;
 
 				to += forward;
-				if (cell.ToRank() == 1 && _board[(int)to] == Piece.None)
+				if (cell.ToRank() == 1 && _board[to] == Piece.None)
 				{
 					yield return to;
 				}
 			}
 
-			Piece capture;
 			to = cell + (forward + Direction.Left);
-			if (to != Cell.None && (to == _enpassant || ((capture = _board[(int)to]) != Piece.None && capture.ToColor() != _active)))
+			if (to != Cell.None && (to == _enpassant || ((_board[to] & Piece.Color) == (_active ^ Piece.Color))))
 			{
 				//*** Allowed to capture an opponent's piece on the board, or the enpassant square
 				yield return to;
 			}
 
 			to = cell + (forward + Direction.Right);
-			if (to != Cell.None && (to == _enpassant || ((capture = _board[(int)to]) != Piece.None && capture.ToColor() != _active)))
+			if (to != Cell.None && (to == _enpassant || ((_board[to] & Piece.Color) == (_active ^ Piece.Color))))
 			{
 				//*** Allowed to capture an opponent's piece on the board, or the enpassant square
 				yield return to;
@@ -263,13 +288,13 @@ namespace Chess.Model
 				yield return move;
 			}
 
-			var queenSide = _active == Color.White ? Castling.Q : Castling.q;
+			var queenSide = _active == Piece.White ? Castling.Q : Castling.q;
 			if ((_castling & queenSide) == queenSide)
 			{
 				yield return cell + Direction.LeftLeft;
 			}
 
-			var kingSide = _active == Color.White ? Castling.K : Castling.k;
+			var kingSide = _active == Piece.White ? Castling.K : Castling.k;
 			if ((_castling & kingSide) == kingSide)
 			{
 				yield return cell + Direction.RightRight;
@@ -285,7 +310,7 @@ namespace Chess.Model
 
 				while (to != Cell.None)
 				{
-					var capture = _board[(int)to];
+					var capture = _board[to];
 					if (capture == Piece.None)
 					{
 						//*** Allowed to move to a cell if there is no piece there
@@ -293,7 +318,7 @@ namespace Chess.Model
 					}
 					else
 					{
-						if (capture.ToColor() != _active)
+						if ((capture & Piece.Color) != _active)
 						{
 							//*** Allowed to capture an opponent's piece
 							yield return to;
@@ -312,6 +337,41 @@ namespace Chess.Model
 					//*** Move to the next cell along the "direction"
 					to = to + direction;
 				}
+			}
+		}
+
+		private struct InternalBoard : IBoard, IEnumerable<Cell>
+		{
+			private Piece[] _pieces;
+
+			public InternalBoard(Board board)
+			{
+				_pieces = board.ToArray();
+			}
+
+			public Piece this[int cell]
+			{
+				get { return _pieces[cell]; }
+				set { _pieces[cell] = value; }
+			}
+
+			public Piece this[Cell cell]
+			{
+				get { return _pieces[(int)cell]; }
+				set { _pieces[(int)cell] = value; }
+			}
+
+			public IEnumerator<Cell> GetEnumerator()
+			{
+				for(Cell i = Cell.a1; i <= Cell.h8; i++)
+				{
+					yield return i;
+				}
+			}
+
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				return ((IEnumerable<Cell>)this).GetEnumerator();
 			}
 		}
 	}

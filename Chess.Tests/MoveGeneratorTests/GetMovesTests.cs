@@ -83,6 +83,18 @@ namespace Chess.Tests.MoveGeneratorTests
 		{
 			var state = GameState.FromForsythEdwardsNotation("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
 			var target = new MoveGenerator(state);
+
+			var moves = target.GetMoves();
+
+			var totalMoves = 0;
+			foreach (var move in moves)
+			{
+				var undo = target.MakeMove(move);
+				totalMoves += target.GetMoves().Count() + 1;
+				target.UndoMove(undo);
+			}
+
+			Assert.AreEqual(2039, totalMoves);
 		}
 	}
 }

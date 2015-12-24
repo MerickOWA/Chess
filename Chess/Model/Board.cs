@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Chess.Model
 {
-	struct Board
+	struct Board : IBoard
 	{
 		private Piece[] _pieces;
 
 		public Board(Piece[] pieces)
 		{
-			_pieces = (Piece[])pieces.Clone();
+			_pieces = pieces;
 		}
 
 		public Piece this[Cell cell] => _pieces[(int)cell];

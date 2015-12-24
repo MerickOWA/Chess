@@ -57,9 +57,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="BoardTests.cs" />
     <Compile Include="MoveGeneratorTests\MakeMoveTests.cs" />
     <Compile Include="MoveGeneratorTests\GetMovesTests.cs" />
+    <Compile Include="MoveGeneratorTests\UndoMoveTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GameStateTests.cs" />
   </ItemGroup>

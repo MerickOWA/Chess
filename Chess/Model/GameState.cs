@@ -25,10 +25,10 @@ namespace Chess.Model
 			{ Piece.BlackKing,   'k' },
 		};
 
-		private static readonly BiDictionary<Color, char> _ColorChar = new BiDictionary<Color, char>
+		private static readonly BiDictionary<Piece, char> _ColorChar = new BiDictionary<Piece, char>
 		{
-			{ Color.White, 'w' },
-			{ Color.Black, 'b' },
+			{ Piece.White, 'w' },
+			{ Piece.Black, 'b' },
 		};
 
 		private static readonly BiDictionary<Castling, char> _CastlingChar = new BiDictionary<Castling, char>
@@ -39,14 +39,19 @@ namespace Chess.Model
 			{ Castling.K, 'K' },
 		};
 
-		public GameState(Piece[] board, Color active, Castling castling, Cell enpassant, int draw, int move)
-			: this(new Board(board), active, castling, enpassant, draw, move)
+		public GameState(Piece[] board, Piece active, Castling castling, Cell enpassant, int draw, int move)
 		{
-		}
+			if (board.Length != 64)
+			{
+				throw new ArgumentException("Board must be 64 squares", nameof(board));
+			}
 
-		public GameState(Board board, Color active, Castling castling, Cell enpassant, int draw, int move)
-		{
-			Board = board;
+			if (active != Piece.White && active != Piece.Black)
+			{
+				throw new ArgumentException("Must be White or Black", nameof(active));
+			}
+
+			Board = new Board((Piece[])board.Clone());
 			Active = active;
 			Castling = castling;
 			Enpassant = enpassant;
@@ -55,7 +60,7 @@ namespace Chess.Model
 		}
 
 		public Board Board { get; }
-		public Color Active { get; }
+		public Piece Active { get; }
 		public Castling Castling { get; }
 		public Cell Enpassant { get; }
 		public int DrawClock { get; }
@@ -116,9 +121,9 @@ namespace Chess.Model
 			return retval;
 		}
 
-		private static Color ParseActive(string state, ref int i)
+		private static Piece ParseActive(string state, ref int i)
 		{
-			Color retval;
+			Piece retval;
 
 			if (!_ColorChar.TryGetFirst(state[i], out retval))
 			{
