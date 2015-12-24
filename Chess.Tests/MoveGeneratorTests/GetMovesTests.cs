@@ -3,10 +3,10 @@ using System.Linq;
 using Chess.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Chess.Tests
+namespace Chess.Tests.MoveGeneratorTests
 {
 	[TestClass]
-	public class MoveGeneratorTests
+	public class GetMovesTests
 	{
 		[TestMethod]
 		public void Test_MoveGenerator_GetMoves()
@@ -76,6 +76,13 @@ namespace Chess.Tests
 				new Move(Cell.e5, Cell.d7),
 				new Move(Cell.e5, Cell.f7),
 			}, actual);
+		}
+
+		[TestMethod]
+		public void GetMoves_Depth_1_Tests()
+		{
+			var state = GameState.FromForsythEdwardsNotation("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+			var target = new MoveGenerator(state);
 		}
 	}
 }

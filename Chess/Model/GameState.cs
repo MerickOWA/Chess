@@ -40,8 +40,13 @@ namespace Chess.Model
 		};
 
 		public GameState(Piece[] board, Color active, Castling castling, Cell enpassant, int draw, int move)
+			: this(new Board(board), active, castling, enpassant, draw, move)
 		{
-			Board = new Board(board);
+		}
+
+		public GameState(Board board, Color active, Castling castling, Cell enpassant, int draw, int move)
+		{
+			Board = board;
 			Active = active;
 			Castling = castling;
 			Enpassant = enpassant;

@@ -8,27 +8,34 @@ namespace Chess.Model
 {
 	struct Move
 	{
-		public Move(Cell from, Cell to)
+		public Move(Cell from, Cell to, Piece promotion = Piece.None)
 		{
 			From = from;
 			To = to;
+			Promotion = promotion;
 		}
 
 		public Cell From { get; }
 
 		public Cell To { get; }
 
+		public Piece Promotion { get; }
+
 		public override string ToString()
 		{
-			var chars = new char[4];
+			var chars = new char[Promotion != Piece.None ? 5 : 4];
 
-			return new string(new[]
+			chars[0] = From.ToFileChar();
+			chars[1] = From.ToRankChar();
+			chars[2] = To.ToFileChar();
+			chars[3] = To.ToRankChar();
+
+			if (Promotion != Piece.None)
 			{
-				this.From.ToFileChar(),
-				this.From.ToRankChar(),
-				this.To.ToFileChar(),
-				this.To.ToRankChar(),
-			});
+				chars[4] = Promotion.ToChar();
+			}
+
+			return new string(chars);
 		}
 	}
 }
