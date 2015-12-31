@@ -79,6 +79,26 @@ namespace Chess.Tests.MoveGeneratorTests
 		}
 
 		[TestMethod]
+		public void Expect_white_pawn_can_make_double_move_from_2th_rank()
+		{
+			var target = new MoveGenerator(GameState.FromForsythEdwardsNotation("4k3/8/8/8/8/8/P7/4K3 w - -"));
+
+			var moves = target.GetMoves();
+
+			Assert.IsTrue(moves.Contains(new Move(Cell.a2, Cell.a4)));
+		}
+
+		[TestMethod]
+		public void Expect_black_pawn_can_make_double_move_from_7th_rank()
+		{
+			var target = new MoveGenerator(GameState.FromForsythEdwardsNotation("4k3/p7/8/8/8/8/8/4K3 b - -"));
+
+			var moves = target.GetMoves();
+
+			Assert.IsTrue(moves.Contains(new Move(Cell.a7, Cell.a5)));
+		}
+
+		[TestMethod]
 		public void Expect_king_doesnt_move_to_attacked_cell()
 		{
 			target.MakeMove(new Move(Cell.e5, Cell.g6));
@@ -162,6 +182,28 @@ namespace Chess.Tests.MoveGeneratorTests
 			}
 
 			Assert.AreEqual(2039, totalMoves);
+		}
+
+		[TestMethod]
+		public void GetMoves_Depth_2_Tests()
+		{
+			var moves = target.GetMoves();
+
+			var totalMoves = 0;
+			foreach (var move0 in target.GetMoves())
+			{
+				totalMoves++;
+				var undo0 = target.MakeMove(move0);
+				foreach (var move1 in target.GetMoves())
+				{
+					var undo1 = target.MakeMove(move1);
+					totalMoves += target.GetMoves().Count() + 1;
+					target.UndoMove(undo1);
+				}
+				target.UndoMove(undo0);
+			}
+
+			Assert.AreEqual(97862, totalMoves);
 		}
 	}
 }

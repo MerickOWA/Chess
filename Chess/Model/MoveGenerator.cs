@@ -301,10 +301,10 @@ namespace Chess.Model
 			switch (piece)
 			{
 				case Piece.WhitePawn:
-					return PawnMoves(cell, Direction.Up, isOccupied, pin);
+					return PawnMoves(cell, isOccupied, pin, Direction.Up, 1);
 
 				case Piece.BlackPawn:
-					return PawnMoves(cell, Direction.Down, isOccupied, pin);
+					return PawnMoves(cell, isOccupied, pin, Direction.Down, 6);
 
 				case Piece.WhiteKnight:
 				case Piece.BlackKnight:
@@ -331,7 +331,7 @@ namespace Chess.Model
 			}
 		}
 
-		private static IEnumerable<Cell> PawnMoves(Cell cell, Direction forward, Func<Cell, bool> isOccupied, Direction? pin)
+		private static IEnumerable<Cell> PawnMoves(Cell cell, Func<Cell, bool> isOccupied, Direction? pin, Direction forward, int initalRank)
 		{
 			var dir = forward;
 			var to = cell + dir;
@@ -340,7 +340,7 @@ namespace Chess.Model
 				yield return to;
 
 				to += forward;
-				if (cell.ToRank() == 1 && !isOccupied(to))
+				if (cell.ToRank() == initalRank && !isOccupied(to))
 				{
 					yield return to;
 				}
