@@ -184,6 +184,7 @@ namespace Chess.Model
 
 		public IEnumerable<Move> GetMoves()
 		{
+			var opponent = _active ^ Piece.Color;
 			Func<Cell, bool> isOccupied = cell => _board[cell] != Piece.None;
 
 			//*** Generate all movements of opponent pieces which could capture the current player's king
@@ -197,11 +198,22 @@ namespace Chess.Model
 			var attacks =
 				from src in _board
 				let piece = _board[src]
-				where (piece & Piece.Color) == (_active ^ Piece.Color)
-				from dst in CellMoves(src, piece, (piece & Piece.Type) != Piece.Pawn ? isOccupied : _ => true)
+				where (piece & Piece.Color) == opponent
+				from dst in CellMoves(src, piece, (piece & Piece.Type) != Piece.Pawn ? isOccupied : _ => true, null)
 				select new Move(src, dst);
 
 			var kingCell = _board.First(cell => _board[cell] == (Piece.King | _active));
+
+			var pins = (
+				from dir in Direction.Queen
+				let pinnedCell = OccupiedInDirection(kingCell, dir, isOccupied)
+				where pinnedCell != Cell.None && (_board[pinnedCell] & Piece.Color) == _active
+				let pinnerCell = OccupiedInDirection(pinnedCell, dir, isOccupied)
+				where pinnerCell != Cell.None
+				let pinner = _board[pinnerCell]
+				where (pinner & Piece.Color) == opponent && Direction.CanMove(pinner, dir)
+				select new { Cell = pinnedCell, Direction = dir.Abs() })
+				.ToDictionary(k => k.Cell, v => v.Direction);
 
 			var checks = attacks.Where(o => o.To == kingCell);
 			var attacked = new HashSet<Cell>(attacks.Select(o => o.To));
@@ -214,8 +226,7 @@ namespace Chess.Model
 				if ((piece & Piece.Color) != _active) continue; // skip empty & opponent squares
 
 				var pieceType = piece & Piece.Type;
-
-				foreach (var to in CellMoves(from, piece, isOccupied))
+				foreach (var to in CellMoves(from, piece, isOccupied, pins.GetNullable(from)))
 				{
 					if ((_board[to] & Piece.Color) == _active) continue; // skip captures of player's own pieces
 
@@ -285,45 +296,46 @@ namespace Chess.Model
 			}
 		}
 
-		private static IEnumerable<Cell> CellMoves(Cell cell, Piece piece, Func<Cell,bool> isOccupied)
+		private static IEnumerable<Cell> CellMoves(Cell cell, Piece piece, Func<Cell,bool> isOccupied, Direction? pin)
 		{
 			switch (piece)
 			{
 				case Piece.WhitePawn:
-					return PawnMoves(cell, Direction.Up, isOccupied);
+					return PawnMoves(cell, Direction.Up, isOccupied, pin);
 
 				case Piece.BlackPawn:
-					return PawnMoves(cell, Direction.Down, isOccupied);
+					return PawnMoves(cell, Direction.Down, isOccupied, pin);
 
 				case Piece.WhiteKnight:
 				case Piece.BlackKnight:
-					return KnightMoves(cell, isOccupied);
+					return SlidingMoves(cell, Direction.Knight, isOccupied, pin, limited: true);
 
 				case Piece.WhiteBishop:
 				case Piece.BlackBishop:
-					return BishopMoves(cell, isOccupied);
+					return SlidingMoves(cell, Direction.Bishop, isOccupied, pin, limited: false);
 
 				case Piece.WhiteRook:
 				case Piece.BlackRook:
-					return RookMoves(cell, isOccupied);
+					return SlidingMoves(cell, Direction.Rook, isOccupied, pin, limited: false);
 
 				case Piece.WhiteQueen:
 				case Piece.BlackQueen:
-					return QueenMoves(cell, isOccupied);
+					return SlidingMoves(cell, Direction.Queen, isOccupied, pin, limited: false);
 
 				case Piece.WhiteKing:
 				case Piece.BlackKing:
-					return KingMoves(cell, isOccupied);
+					return SlidingMoves(cell, Direction.Queen, isOccupied, pin, limited: true);
 
 				default:
 					throw new InvalidOperationException("Can't generate moves for unknown piece");
 			}
 		}
 
-		private static IEnumerable<Cell> PawnMoves(Cell cell, Direction forward, Func<Cell, bool> isOccupied)
+		private static IEnumerable<Cell> PawnMoves(Cell cell, Direction forward, Func<Cell, bool> isOccupied, Direction? pin)
 		{
-			var to = cell + forward;
-			if (!isOccupied(to))
+			var dir = forward;
+			var to = cell + dir;
+			if (!isOccupied(to) && IsAllowedByPin(pin, dir))
 			{
 				yield return to;
 
@@ -334,49 +346,29 @@ namespace Chess.Model
 				}
 			}
 
-			to = cell + (forward + Direction.Left);
-			if (to != Cell.None && isOccupied(to))
+			dir = forward + Direction.Left;
+			to = cell + dir;
+			if (to != Cell.None && isOccupied(to) && IsAllowedByPin(pin, dir))
 			{
 				yield return to;
 			}
 
-			to = cell + (forward + Direction.Right);
-			if (to != Cell.None && isOccupied(to))
+			dir = forward + Direction.Right;
+			to = cell + dir;
+			if (to != Cell.None && isOccupied(to) && IsAllowedByPin(pin, dir))
 			{
 				yield return to;
 			}
 		}
 
-		private static IEnumerable<Cell> KnightMoves(Cell cell, Func<Cell, bool> isOccupied)
-		{
-			return SlidingMoves(cell, Direction.Knight, isOccupied, limited: true);
-		}
-
-		private static IEnumerable<Cell> BishopMoves(Cell cell, Func<Cell, bool> isOccupied)
-		{
-			return SlidingMoves(cell, Direction.Bishop, isOccupied, limited: false);
-		}
-
-		private static IEnumerable<Cell> RookMoves(Cell cell, Func<Cell, bool> isOccupied)
-		{
-			return SlidingMoves(cell, Direction.Rook, isOccupied, limited: false);
-		}
-
-		private static IEnumerable<Cell> QueenMoves(Cell cell, Func<Cell,bool> isOccupied)
-		{
-			return SlidingMoves(cell, Direction.Queen, isOccupied, limited: false);
-		}
-
-		private static IEnumerable<Cell> KingMoves(Cell cell, Func<Cell, bool> isOccupied)
-		{
-			return SlidingMoves(cell, Direction.Queen, isOccupied, limited: true);
-		}
-
-		private static IEnumerable<Cell> SlidingMoves(Cell from, IEnumerable<Direction> directions, Func<Cell, bool> isOccupied, bool limited)
+		private static IEnumerable<Cell> SlidingMoves(Cell from, IEnumerable<Direction> directions, Func<Cell, bool> isOccupied, Direction? pin, bool limited)
 		{
 			//*** Generate moves in every direction
 			foreach (var direction in directions)
 			{
+				//*** If we're pinned, the piece can only move along the direction of the pin (either toward or away)
+				if (!IsAllowedByPin(pin, direction)) continue;
+
 				var to = from + direction;
 
 				while (to != Cell.None)
@@ -405,6 +397,23 @@ namespace Chess.Model
 					to = to + direction;
 				}
 			}
+		}
+
+		private static bool IsAllowedByPin(Direction? pin, Direction direction)
+		{
+			return pin == null || direction.Abs() == pin.Value;
+		}
+
+		private Cell OccupiedInDirection(Cell from, Direction direction, Func<Cell,bool> isOccupied)
+		{
+			var cell = from;
+
+			do
+			{
+				cell += direction;
+			} while (cell != Cell.None && !isOccupied(cell));
+
+			return cell;
 		}
 
 		private struct InternalBoard : IBoard, IEnumerable<Cell>

@@ -33,6 +33,43 @@ namespace Chess.Model
 			return new Direction(a.File + b.File, a.Rank + b.Rank);
 		}
 
+		public static Direction operator -(Direction o)
+		{
+			return new Direction(-o.File, -o.Rank);
+		}
+
+		public static bool operator ==(Direction a, Direction b)
+		{
+			return a.File == b.File && a.Rank == b.Rank;
+		}
+
+		public static bool operator !=(Direction a, Direction b)
+		{
+			return a.File != b.File || a.Rank != b.Rank;
+		}
+
+		public override bool Equals(object obj)
+		{
+			return obj != null
+				&& obj is Direction
+				&& this == (Direction)obj;
+		}
+
+		public override int GetHashCode()
+		{
+			return Rank*8 + File;
+		}
+
+		public int Sign()
+		{
+			return Math.Sign(Rank != 0 ? Rank : File);
+		}
+
+		public Direction Abs()
+		{
+			return Sign() >= 0 ? this : -this;
+		}
+
 		public static readonly Direction Down = new Direction(0, -1);
 		public static readonly Direction Left = new Direction(-1, 0);
 		public static readonly Direction Right = new Direction(1, 0);
@@ -52,7 +89,7 @@ namespace Chess.Model
 		public static readonly Direction UpUpLeft = Up + Up + Left;
 		public static readonly Direction UpUpRight = Up + Up + Right;
 
-		public static readonly IEnumerable<Direction> Knight = new[]
+		public static readonly ISet<Direction> Knight = new HashSet<Direction>
 		{
 			DownDownLeft,
 			DownDownRight,
@@ -64,7 +101,7 @@ namespace Chess.Model
 			UpUpRight,
 		};
 
-		public static readonly IEnumerable<Direction> Bishop = new[]
+		public static readonly ISet<Direction> Bishop = new HashSet<Direction>
 		{
 			DownLeft,
 			DownRight,
@@ -72,7 +109,7 @@ namespace Chess.Model
 			UpRight,
 		};
 
-		public static readonly IEnumerable<Direction> Rook = new[]
+		public static readonly ISet<Direction> Rook = new HashSet<Direction>
 		{
 			Down,
 			Left,
@@ -80,6 +117,22 @@ namespace Chess.Model
 			Up,
 		};
 
-		public static readonly IEnumerable<Direction> Queen = Rook.Concat(Bishop);
+		public static readonly ISet<Direction> Queen = new HashSet<Direction>(Rook.Concat(Bishop));
+
+		public static readonly IDictionary<Piece, ISet<Direction>> Piece = new Dictionary<Piece, ISet<Direction>>
+		{
+			{ Model.Piece.WhiteQueen, Queen },
+			{ Model.Piece.WhiteRook, Rook },
+			{ Model.Piece.WhiteBishop, Bishop },
+			{ Model.Piece.BlackQueen, Queen },
+			{ Model.Piece.BlackRook, Rook },
+			{ Model.Piece.BlackBishop, Bishop },
+		};
+
+		public static bool CanMove(Piece piece, Direction dir)
+		{
+			ISet<Direction> allowableDirections;
+			return Piece.TryGetValue(piece, out allowableDirections) && allowableDirections.Contains(dir);
+		}
 	}
 }

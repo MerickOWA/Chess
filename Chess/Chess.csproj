@@ -74,6 +74,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\EnumerableExtensions.cs" />
     <Compile Include="Model\IBoard.cs" />
     <Compile Include="Model\UndoMove.cs" />
     <Compile Include="UI\WhiteBishop.xaml.cs">
