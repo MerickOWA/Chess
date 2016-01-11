@@ -169,40 +169,131 @@ namespace Chess.Tests.MoveGeneratorTests
 		}
 
 		[TestMethod]
-		public void GetMoves_Depth_1_Tests()
+		public void Ensure_moves_in_check_block_eliminate_attacker()
 		{
+			target.MakeMove(new Move(Cell.e1, Cell.f1));
+			target.MakeMove(new Move(Cell.h3, Cell.g2));
+
 			var moves = target.GetMoves();
 
+			//*** Queen on f3 only has one move
+			Assert.AreEqual(1, moves.Count(o => o.From == Cell.f3));
+			//*** ... to take the pawn on g2
+			Assert.AreEqual(Cell.g2, moves.First(o => o.From == Cell.f3).To);
+		}
+
+		[TestMethod]
+		public void Ensure_pinned_piece_doesnt_expose_king()
+		{
+			target.MakeMove(new Move(Cell.e1, Cell.f1));
+			target.MakeMove(new Move(Cell.a8, Cell.b8));
+
+			var moves = target.GetMoves();
+
+			Assert.IsFalse(moves.Contains(new Move(Cell.e2, Cell.d1)));
+		}
+
+		[TestMethod]
+		public void Ensure_pinned_piece_can_move_along_pinning_diagonal()
+		{
+			target.MakeMove(new Move(Cell.e1, Cell.f1));
+			target.MakeMove(new Move(Cell.a8, Cell.b8));
+
+			var moves = target.GetMoves();
+
+			Assert.IsTrue(moves.Contains(new Move(Cell.e2, Cell.d3)));
+		}
+
+		[TestMethod]
+		public void Ensure_pinned_piece_can_capture_the_pinning_piece()
+		{
+			target.MakeMove(new Move(Cell.e1, Cell.f1));
+			target.MakeMove(new Move(Cell.a8, Cell.b8));
+
+			var moves = target.GetMoves();
+
+			Assert.IsTrue(moves.Contains(new Move(Cell.e2, Cell.a6)));
+		}
+
+		[TestMethod]
+		public void GetMoves_Depth_0_Tests()
+		{
 			var totalMoves = 0;
-			foreach (var move in moves)
+			var totalCaptures = 0;
+			var totalEnpassants = 0;
+			var totalCastles = 0;
+
+			var moves = target.GetMoves();
+
+			totalMoves += moves.Count();
+			totalCaptures += moves.Count(o => target.Board[o.To] != Piece.None);
+			totalCastles += moves.Count(o => (target.Board[o.From] & Piece.Type) == Piece.King && Math.Abs(o.From.File() - o.To.File()) == 2);
+			totalEnpassants += moves.Count(o => (target.Board[o.From] & Piece.Type) == Piece.Pawn && o.To == target.Enpassant);
+
+			Assert.AreEqual(48, totalMoves, "Incorrect # of moves");
+			Assert.AreEqual(8, totalCaptures, "Incorrect # of captures");
+			Assert.AreEqual(0, totalEnpassants, "Incorrect # of enpassants");
+			Assert.AreEqual(2, totalCastles, "Incorrect # of castling");
+		}
+
+		[TestMethod]
+		public void GetMoves_Depth_1_Tests()
+		{
+			var totalMoves = 0;
+			var totalCaptures = 0;
+			var totalEnpassants = 0;
+			var totalCastles = 0;
+
+			foreach (var move0 in target.GetMoves())
 			{
-				var undo = target.MakeMove(move);
-				totalMoves += target.GetMoves().Count() + 1;
-				target.UndoMove(undo);
+				var undo0 = target.MakeMove(move0);
+
+				var moves = target.GetMoves();
+
+				totalMoves += moves.Count();
+				totalCaptures += moves.Count(o => target.Board[o.To] != Piece.None);
+				totalCastles += moves.Count(o => (target.Board[o.From] & Piece.Type) == Piece.King && Math.Abs(o.From.File() - o.To.File()) == 2);
+				totalEnpassants += moves.Count(o => (target.Board[o.From] & Piece.Type) == Piece.Pawn && o.To == target.Enpassant);
+
+				target.UndoMove(undo0);
 			}
 
-			Assert.AreEqual(2039, totalMoves);
+			Assert.AreEqual(2039, totalMoves, "Incorrect # of moves");
+			Assert.AreEqual(351, totalCaptures, "Incorrect # of captures");
+			Assert.AreEqual(1, totalEnpassants, "Incorrect # of enpassants");
+			Assert.AreEqual(91, totalCastles, "Incorrect # of castling");
 		}
 
 		[TestMethod]
 		public void GetMoves_Depth_2_Tests()
 		{
-			var moves = target.GetMoves();
-
 			var totalMoves = 0;
+			var totalCaptures = 0;
+			var totalEnpassants = 0;
+			var totalCastles = 0;
 			foreach (var move0 in target.GetMoves())
 			{
-				totalMoves++;
+				//totalMoves++;
 				var undo0 = target.MakeMove(move0);
 				foreach (var move1 in target.GetMoves())
 				{
 					var undo1 = target.MakeMove(move1);
-					totalMoves += target.GetMoves().Count() + 1;
+
+					var moves = target.GetMoves();
+
+					totalMoves += moves.Count();
+					totalCaptures += moves.Count(o => target.Board[o.To] != Piece.None);
+					totalCastles += moves.Count(o => (target.Board[o.From] & Piece.Type) == Piece.King && Math.Abs(o.From.File() - o.To.File()) == 2);
+					totalEnpassants += moves.Count(o => (target.Board[o.From] & Piece.Type) == Piece.Pawn && o.To == target.Enpassant);
+
 					target.UndoMove(undo1);
 				}
 				target.UndoMove(undo0);
 			}
 
+			Assert.AreEqual(3162, totalCastles);
+			Assert.AreEqual(45, totalEnpassants);
+			Assert.AreEqual(17102, totalCaptures);
 			Assert.AreEqual(97862, totalMoves);
 		}
 	}

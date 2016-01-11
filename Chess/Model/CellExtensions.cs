@@ -13,7 +13,7 @@ namespace Chess.Model
 			return file >= 0 && file < 8 && rank >= 0 && rank < 8 ? (Cell)(rank * 8 + file) : Cell.None;
 		}
 
-		public static int ToFile(this Cell cell)
+		public static int File(this Cell cell)
 		{
 			if (cell == Cell.None)
 			{
@@ -23,7 +23,7 @@ namespace Chess.Model
 			return (int)cell % 8;
 		}
 
-		public static int ToRank(this Cell cell)
+		public static int Rank(this Cell cell)
 		{
 			if (cell == Cell.None)
 			{
@@ -35,12 +35,12 @@ namespace Chess.Model
 
 		public static char ToFileChar(this Cell cell)
 		{
-			return cell != Cell.None ? (char)('a' + cell.ToFile()) : '-';
+			return cell != Cell.None ? (char)('a' + cell.File()) : '-';
 		}
 
 		public static char ToRankChar(this Cell cell)
 		{
-			return cell != Cell.None ? (char)('1' + cell.ToRank()) : '-';
+			return cell != Cell.None ? (char)('1' + cell.Rank()) : '-';
 		}
 	}
 }

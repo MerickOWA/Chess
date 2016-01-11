@@ -25,7 +25,7 @@ namespace Chess.Model
 				throw new InvalidOperationException("Can't move from nowhere");
 			}
 
-			return CellExtensions.ToCell(cell.ToFile() + direction.File, cell.ToRank() + direction.Rank);
+			return CellExtensions.ToCell(cell.File() + direction.File, cell.Rank() + direction.Rank);
 		}
 
 		public static Direction operator +(Direction a, Direction b)
@@ -68,6 +68,19 @@ namespace Chess.Model
 		public Direction Abs()
 		{
 			return Sign() >= 0 ? this : -this;
+		}
+
+		public override string ToString()
+		{
+			var parts = Enumerable.Empty<string>();
+
+			if (Rank != 0)
+				parts = parts.Concat(Enumerable.Repeat(Rank > 0 ? "Up" : "Down", Math.Abs(Rank)));
+
+			if (File != 0)
+				parts = parts.Concat(Enumerable.Repeat(File > 0 ? "Right" : "Left", Math.Abs(File)));
+
+			return string.Concat(parts);
 		}
 
 		public static readonly Direction Down = new Direction(0, -1);

@@ -21,6 +21,11 @@ namespace Chess.Model
 
 		public Piece Promotion { get; }
 
+		public Move PromoteTo(Piece promotion)
+		{
+			return new Move(From, To, promotion);
+		}
+
 		public override string ToString()
 		{
 			var chars = new char[Promotion != Piece.None ? 5 : 4];

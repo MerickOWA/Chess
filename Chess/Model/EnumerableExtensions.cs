@@ -13,5 +13,10 @@ namespace Chess.Model
 			TValue value;
 			return dictionary.TryGetValue(key, out value) ? (TValue?)value : null;
 		}
+
+		public static ISet<T> ToSet<T>(this IEnumerable<T> collection)
+		{
+			return new HashSet<T>(collection);
+		}
 	}
 }
