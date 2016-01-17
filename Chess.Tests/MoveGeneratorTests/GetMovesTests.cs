@@ -216,6 +216,16 @@ namespace Chess.Tests.MoveGeneratorTests
 		}
 
 		[TestMethod]
+		public void Ensure_king_can_just_step_away_from_check()
+		{
+			var target = new MoveGenerator(GameState.FromForsythEdwardsNotation("1K5r/8/1k6/8/8/8/8/8 w - -"));
+
+			var moves = target.GetMoves();
+
+			Assert.IsFalse(moves.Contains(new Move(Cell.b8, Cell.a8)));
+		}
+
+		[TestMethod]
 		public void GetMoves_Depth_0_Tests()
 		{
 			var totalMoves = 0;
@@ -259,7 +269,7 @@ namespace Chess.Tests.MoveGeneratorTests
 			}
 
 			Assert.AreEqual(2039, totalMoves, "Incorrect # of moves");
-			Assert.AreEqual(351, totalCaptures, "Incorrect # of captures");
+			Assert.AreEqual(351, totalCaptures + totalEnpassants, "Incorrect # of captures");
 			Assert.AreEqual(1, totalEnpassants, "Incorrect # of enpassants");
 			Assert.AreEqual(91, totalCastles, "Incorrect # of castling");
 		}
@@ -293,7 +303,7 @@ namespace Chess.Tests.MoveGeneratorTests
 
 			Assert.AreEqual(3162, totalCastles);
 			Assert.AreEqual(45, totalEnpassants);
-			Assert.AreEqual(17102, totalCaptures);
+			Assert.AreEqual(17102, totalCaptures + totalEnpassants);
 			Assert.AreEqual(97862, totalMoves);
 		}
 	}
